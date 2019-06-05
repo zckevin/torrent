@@ -19,7 +19,7 @@ import (
 	"github.com/anacrolix/torrent/storage"
 )
 
-var DefaultHTTPUserAgent = "Go-Torrent/1.0"
+var DefaultHTTPUserAgent = "Transmission/2.77"
 
 // Probably not safe to modify this after it's given to a Client.
 type ClientConfig struct {
@@ -150,7 +150,7 @@ func NewDefaultClientConfig() *ClientConfig {
 	cc := &ClientConfig{
 		HTTPUserAgent:                  DefaultHTTPUserAgent,
 		ExtendedHandshakeClientVersion: "go.torrent dev 20181121",
-		Bep20:                          "-GT0002-",
+		Bep20:                          "-TR2770-",
 		NominalDialTimeout:             20 * time.Second,
 		MinDialTimeout:                 3 * time.Second,
 		EstablishedConnsPerTorrent:     50,
