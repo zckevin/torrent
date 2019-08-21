@@ -108,6 +108,18 @@ func (f *File) NewReader() Reader {
 	return &tr
 }
 
+func (f *File) NewReader2(l int64) Reader {
+	tr := reader{
+		mu:        f.t.cl.locker(),
+		t:         f.t,
+		readahead: 5 * 1024 * 1024,
+		offset:    f.Offset(),
+		length:    l,
+	}
+	f.t.addReader(&tr)
+	return &tr
+}
+
 // Sets the minimum priority for pieces in the File.
 func (f *File) SetPriority(prio piecePriority) {
 	f.t.cl.lock()

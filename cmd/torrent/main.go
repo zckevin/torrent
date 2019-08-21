@@ -12,6 +12,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"strconv"
+	"io"
+	"io/ioutil"
 
 	"github.com/anacrolix/envpprof"
 	"github.com/anacrolix/tagflag"
@@ -118,6 +121,17 @@ func addTorrents(client *torrent.Client) {
 			<-t.GotInfo()
 			t.DownloadAll()
 		}()
+
+	http.HandleFunc("/hehe", func(w http.ResponseWriter, req *http.Request) {
+        s := req.URL.Query().Get("seek")
+        pos, _ := strconv.Atoi(s)
+	    if pos != 0 {
+            r := t.NewReader()
+            r.Seek(int64(pos), io.SeekStart)
+            io.Copy(ioutil.Discard, r)
+	    }
+	})
+
 	}
 }
 
@@ -171,6 +185,10 @@ func main() {
 	clientConfig.Seed = flags.Seed
 	clientConfig.PublicIp4 = flags.PublicIP
 	clientConfig.PublicIp6 = flags.PublicIP
+
+    clientConfig.ProxyURL = "socks5://localhost:12345"
+    clientConfig.PeerID = "-TR2770-huyn9xgy81sc"
+
 	if flags.PackedBlocklist != "" {
 		blocklist, err := iplist.MMapPackedFile(flags.PackedBlocklist)
 		if err != nil {

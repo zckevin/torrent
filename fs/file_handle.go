@@ -72,3 +72,7 @@ func (me fileHandle) Read(ctx context.Context, req *fuse.ReadRequest, resp *fuse
 func (me fileHandle) Release(context.Context, *fuse.ReleaseRequest) error {
 	return me.r.Close()
 }
+
+func (me fileHandle) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
+	return nil
+}
