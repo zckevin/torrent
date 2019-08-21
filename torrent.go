@@ -13,6 +13,7 @@ import (
 	"text/tabwriter"
 	"time"
 	"unsafe"
+	"reflect"
 
 	"github.com/davecgh/go-spew/spew"
 
@@ -532,6 +533,51 @@ func pieceStateRunStatusChars(psr PieceStateRun) (ret string) {
 	return
 }
 
+func (t *Torrent) GetStatus() map[string]interface{} {
+	status := make(map[string]interface{})
+
+	status["name"] = t.Name()
+	status["infoHash"] = t.infoHash.HexString()
+	status["totalLength"] = t.info.TotalLength()
+	status["bytesMissing"] = t.bytesMissingLocked()
+
+	if t.haveInfo() {
+		status["pieceLength"] = t.usualPieceSize()
+	} else {
+		status["pieceLength"] = 0
+	}
+
+	status["numPieces"] = t.numPieces()
+	status["completePieces"] = t.numPiecesCompleted()
+
+	// status["readers"] = [][]int{}
+	rds := [][]int{}
+	t.forReaderOffsetPieces(func(begin, end pieceIndex) (again bool) {
+		status["readers"] = append(rds, []int{begin, end})
+		return true
+	})
+	status["readers"] = rds
+
+	metrics := make(map[string]interface{})
+	stats := t.statsLocked()
+	connstats := stats.ConnStats
+
+	v := reflect.ValueOf(connstats)
+	for i := 0; i < v.NumField(); i++ {
+		metrics[v.Type().Field(i).Name] = v.Field(i).Interface().(Count).n
+	}
+	v = reflect.ValueOf(stats)
+	for i := 0; i < v.NumField(); i++ {
+		name := v.Type().Field(i).Name
+		if name != "ConnStats" {
+			metrics[name] = v.Field(i).Interface()
+		}
+	}
+	status["metrics"] = metrics
+	status["numConns"] = len(t.connsAsSlice())
+	return status
+}
+
 func (t *Torrent) writeStatus(w io.Writer) {
 	fmt.Fprintf(w, "Infohash: %s\n", t.infoHash.HexString())
 	fmt.Fprintf(w, "Metadata length: %d\n", t.metadataSize())
@@ -558,9 +604,11 @@ func (t *Torrent) writeStatus(w io.Writer) {
 	if t.info != nil {
 		fmt.Fprintf(w, "Num Pieces: %d (%d completed)\n", t.numPieces(), t.numPiecesCompleted())
 		fmt.Fprint(w, "Piece States:")
+        counter := 1
 		for _, psr := range t.pieceStateRuns() {
-			w.Write([]byte(" "))
-			w.Write([]byte(pieceStateRunStatusChars(psr)))
+            _s := fmt.Sprintf("%d\t%s\n", counter, pieceStateRunStatusChars(psr))
+			w.Write([]byte(_s))
+			counter += psr.Length
 		}
 		fmt.Fprintln(w)
 	}

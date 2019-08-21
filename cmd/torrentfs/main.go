@@ -91,6 +91,10 @@ func mainExitCode() int {
 	cfg.DisableTrackers = args.DisableTrackers
 	cfg.NoUpload = true // Ensure that downloads are responsive.
 	cfg.SetListenAddr(args.ListenAddr.String())
+
+    cfg.ProxyURL = "socks5://localhost:9090"
+    cfg.PeerID = "-TR2770-huyn9xgy85sc"
+
 	client, err := torrent.NewClient(cfg)
 	if err != nil {
 		log.Print(err)
