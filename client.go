@@ -1035,6 +1035,7 @@ func (cl *Client) newTorrent(ih metainfo.Hash, specStorage storage.ClientImpl) (
 			L: cl.locker(),
 		},
 		duplicateRequestTimeout: 1 * time.Second,
+		CreateTime: time.Now(),
 	}
 	t.logger = cl.logger.WithValues(t)
 	t.setChunkSize(defaultChunkSize)

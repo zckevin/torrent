@@ -144,6 +144,8 @@ type Torrent struct {
 	// The last time we requested a chunk. Deleting the request from any
 	// connection will clear this value.
 	lastRequested map[request]*time.Timer
+
+	CreateTime time.Time
 }
 
 func (t *Torrent) tickleReaders() {
@@ -446,10 +448,10 @@ func (t *Torrent) setMetadataSize(bytes int) (err error) {
 func (t *Torrent) name() string {
 	t.nameMu.RLock()
 	defer t.nameMu.RUnlock()
-	if t.haveInfo() {
-		return t.info.Name
+	if t.displayName != "" {
+		return t.displayName
 	}
-	return t.displayName
+	return t.info.Name
 }
 
 func (t *Torrent) pieceState(index pieceIndex) (ret PieceState) {

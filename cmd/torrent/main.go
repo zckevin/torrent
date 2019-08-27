@@ -198,7 +198,6 @@ func mainErr() error {
 	clientConfig.PublicIp4 = flags.PublicIP
 	clientConfig.PublicIp6 = flags.PublicIP
 
-    clientConfig.ProxyURL = "socks5://localhost:12345"
     clientConfig.PeerID = "-TR2770-huyn9xgy81sc"
 
 	if flags.PackedBlocklist != "" {

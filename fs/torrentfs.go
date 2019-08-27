@@ -78,6 +78,14 @@ func isSubPath(parent, child string) bool {
 
 func (dn dirNode) ReadDirAll(ctx context.Context) (des []fuse.Dirent, err error) {
 	names := map[string]bool{}
+	if len(dn.metadata.Files) == 0 {
+		de := fuse.Dirent{
+			Name: dn.metadata.Name,
+			Type: fuse.DT_File,
+		}
+		des = append(des, de)
+		return
+	}
 	for _, fi := range dn.metadata.Files {
 		filePathname := strings.Join(fi.Path, "/")
 		if !isSubPath(dn.path, filePathname) {
@@ -140,6 +148,8 @@ func (dn dirNode) Lookup(_ context.Context, name string) (fusefs.Node, error) {
 
 func (dn dirNode) Attr(ctx context.Context, attr *fuse.Attr) error {
 	attr.Mode = os.ModeDir | defaultMode
+	attr.Mtime = dn.t.CreateTime
+	attr.Ctime = dn.t.CreateTime
 	return nil
 }
 
@@ -154,11 +164,7 @@ func (rn rootNode) Lookup(ctx context.Context, name string) (_node fusefs.Node, 
 			FS:       rn.fs,
 			t:        t,
 		}
-		if !info.IsDir() {
-			_node = fileNode{__node, t.Files()[0]}
-		} else {
-			_node = dirNode{__node}
-		}
+		_node = dirNode{__node}
 		break
 	}
 	if _node == nil {
@@ -174,14 +180,8 @@ func (rn rootNode) ReadDirAll(ctx context.Context) (dirents []fuse.Dirent, err e
 			continue
 		}
 		dirents = append(dirents, fuse.Dirent{
-			Name: info.Name,
-			Type: func() fuse.DirentType {
-				if !info.IsDir() {
-					return fuse.DT_File
-				} else {
-					return fuse.DT_Dir
-				}
-			}(),
+			Name: t.Name(),
+			Type: fuse.DT_Dir,
 		})
 	}
 	return
