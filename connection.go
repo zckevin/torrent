@@ -390,7 +390,8 @@ func (cn *connection) nominalMaxRequests() (ret int) {
 				// Request only as many as we expect to receive in the
 				// dupliateRequestTimeout window. We are trying to avoid having to
 				// duplicate requests.
-				cn.chunksReceivedWhileExpecting*int64(cn.t.duplicateRequestTimeout)/expectingTime,
+				// cn.chunksReceivedWhileExpecting*int64(cn.t.duplicateRequestTimeout)/expectingTime,
+				2048,
 			),
 		))
 	}
@@ -775,6 +776,9 @@ func (cn *connection) iterPendingRequests(piece pieceIndex, f func(request) bool
 	return iterUndirtiedChunks(piece, cn.t, func(cs chunkSpec) bool {
 		r := request{pp.Integer(piece), cs}
 		if cn.t.requestStrategy == 3 {
+            // if _, ok := cn.t.pendingRequests[r]; ok {
+            //     return true
+            // }
 			if _, ok := cn.t.lastRequested[r]; ok {
 				// This piece has been requested on another connection, and
 				// the duplicate request timer is still running.

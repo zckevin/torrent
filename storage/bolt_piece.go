@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/binary"
+	"log"
 
 	"github.com/anacrolix/missinggo/x"
 	"github.com/anacrolix/torrent/metainfo"
@@ -16,8 +17,10 @@ type boltDBPiece struct {
 }
 
 var (
-	_             PieceImpl = (*boltDBPiece)(nil)
-	dataBucketKey           = []byte("data")
+	_                 PieceImpl = (*boltDBPiece)(nil)
+	dataBucketKey               = []byte("data")
+	SequenceBucketKey           = []byte("sequence")
+	sequenceKey                 = new(atomicKey)
 )
 
 func (me *boltDBPiece) pc() PieceCompletionGetSetter {
@@ -35,6 +38,19 @@ func (me *boltDBPiece) Completion() Completion {
 }
 
 func (me *boltDBPiece) MarkComplete() error {
+	err := me.db.Update(func(tx *bolt.Tx) error {
+		db, err := tx.CreateBucketIfNotExists(SequenceBucketKey)
+		if err != nil {
+			return err
+		}
+		if err := db.Put(sequenceKey.GetBytes(), me.key[:]); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		log.Println("markcomplete()", err)
+	}
 	return me.pc().Set(me.pk(), true)
 }
 

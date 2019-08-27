@@ -109,9 +109,6 @@ func (t *Torrent) Seeding() bool {
 func (t *Torrent) SetDisplayName(dn string) {
 	t.nameMu.Lock()
 	defer t.nameMu.Unlock()
-	if t.haveInfo() {
-		return
-	}
 	t.displayName = dn
 }
 

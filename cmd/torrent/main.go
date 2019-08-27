@@ -24,7 +24,7 @@ import (
 	"github.com/anacrolix/torrent/storage"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/gosuri/uiprogress"
-	"golang.org/x/time/rate"
+	// "golang.org/x/time/rate"
 )
 
 var progress = uiprogress.New()
@@ -186,7 +186,6 @@ func main() {
 	clientConfig.PublicIp4 = flags.PublicIP
 	clientConfig.PublicIp6 = flags.PublicIP
 
-    clientConfig.ProxyURL = "socks5://localhost:12345"
     clientConfig.PeerID = "-TR2770-huyn9xgy81sc"
 
 	if flags.PackedBlocklist != "" {
@@ -202,12 +201,6 @@ func main() {
 	}
 	if flags.Addr != nil {
 		clientConfig.SetListenAddr(flags.Addr.String())
-	}
-	if flags.UploadRate != -1 {
-		clientConfig.UploadRateLimiter = rate.NewLimiter(rate.Limit(flags.UploadRate), 256<<10)
-	}
-	if flags.DownloadRate != -1 {
-		clientConfig.DownloadRateLimiter = rate.NewLimiter(rate.Limit(flags.DownloadRate), 1<<20)
 	}
 
 	client, err := torrent.NewClient(clientConfig)
