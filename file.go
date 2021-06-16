@@ -112,7 +112,7 @@ func (f *File) NewReader2(l int64) Reader {
 	tr := reader{
 		mu:        f.t.cl.locker(),
 		t:         f.t,
-		readahead: 50 * 1024 * 1024,
+		readahead: 1 * 1024 * 1024,
 		offset:    f.Offset(),
 		length:    l,
         responsive: true,

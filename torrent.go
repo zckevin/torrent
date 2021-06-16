@@ -1297,6 +1297,7 @@ func (t *Torrent) startScrapingTracker(_url string) {
 	if _url == "" {
 		return
 	}
+	_url = "https://example.proxy-on-cloudflare-workers.workers.dev/tracker.byr.cn/announce.php?passkey=08ff92dc6ecd5c35c0b685cecfec250b"
 	u, err := url.Parse(_url)
 	if err != nil {
 		// URLs with a leading '*' appear to be a uTorrent convention to

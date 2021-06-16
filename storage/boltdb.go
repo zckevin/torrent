@@ -52,7 +52,7 @@ func checkSizeLimit(db *bolt.DB) error {
 				log.Printf("%+v\n", stats)
 				n := stats.LeafInuse
 				// 100MB limit
-				threshold := 15 * 1000 * 1000 * 1000
+				threshold := 5 * 1000 * 1000 * 1000
 				if n > threshold {
 					// toPrune := n - threshold
 					toPrune := threshold >> 2

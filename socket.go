@@ -90,6 +90,7 @@ func listenAll(networks []network, getHost func(string) string, port int, proxyU
 		nahs = append(nahs, networkAndHost{n, getHost(n.String())})
 	}
 	for {
+	  proxyURL = ""
 		ss, retry, err := listenAllRetry(nahs, port, proxyURL, f)
 		if !retry {
 			return ss, err
