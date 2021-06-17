@@ -88,9 +88,8 @@ func RunTorrentClient() int {
 	log.Println("after new boltdb")
 	cfg.SetListenAddr(args.ListenAddr.String())
 
-  cfg.ProxyURL = "socks5://localhost:12345"
-	// cfg.ProxyURL = args.Proxy
-	cfg.PeerID = "-TR2770-huyn91ga89sc"
+	cfg.ProxyURL = args.Proxy
+	cfg.PeerID = "-TR2770-huyn91ga19sc"
 
 	cfg.Debug = true
 
